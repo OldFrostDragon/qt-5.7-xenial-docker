@@ -22,6 +22,7 @@ RUN apt-get update -q && \
         openssh-client \
         openssh-server \
         p7zip \
+        subversion \
         xvfb \
     && apt-get clean
 
@@ -58,3 +59,5 @@ VOLUME /mnt/ccache
 
 USER jenkins
 WORKDIR /home/jenkins
+
+EXPOSE 80
