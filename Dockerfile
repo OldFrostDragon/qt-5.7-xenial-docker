@@ -58,8 +58,7 @@ RUN dbus-uuidgen > /var/lib/dbus/machine-id
 #install Qt to /opt directory
 ADD qt-installer-noninteractive.qs /tmp/qt/script.qs
 
-# ADD http://download.qt.io/official_releases/qt/${QTM}/${QT}/qt-opensource-linux-x64-${QT}.run /tmp/qt/installer.run
-ADD ./qt-opensource-linux-x64-${QT}.run /tmp/qt/installer.run
+ADD http://download.qt.io/official_releases/qt/${QTM}/${QT}/qt-opensource-linux-x64-${QT}.run /tmp/qt/installer.run
 
 RUN chmod +x /tmp/qt/installer.run \
     && xvfb-run --server-args="-screen 0, 1024x768x24" /tmp/qt/installer.run -v --script /tmp/qt/script.qs \
