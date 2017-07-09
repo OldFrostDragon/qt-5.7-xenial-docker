@@ -7,6 +7,7 @@ ARG QTM=5.7
 # Preparations for sshd and qt
 RUN apt-get update -q && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends \
+        bash-completion \
         build-essential \
         ca-certificates \
         ccache \
@@ -18,6 +19,7 @@ RUN apt-get update -q && \
         # default-jdk \
         git \
         libclang-3.8-dev \
+        wget \
         # for qt installer
         libdbus-1-3 \
         libglu1-mesa-dev \
@@ -51,6 +53,15 @@ RUN apt-get update -q && \
         libx11-xcb-dev \
         libxi-dev \
         libxrender-dev \
+        # debian package build
+        dpkg \
+        debconf \
+        debhelper \
+        devscripts \
+        lintian \
+        hashdeep \
+        fakeroot \
+        patchelf \
     && apt-get clean
 
 RUN dbus-uuidgen > /var/lib/dbus/machine-id
@@ -93,12 +104,25 @@ RUN mkdir /tmp/clazy && \
     cd ../.. && \
     rm -rf /tmp/clazy
 
+# unpack and add linuxdeployqt
+RUN mkdir /opt/linuxdeployqt && \
+    wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" \
+    -O /opt/linuxdeployqt/linuxdeployqt.AppImage && \
+    chmod a+x /opt/linuxdeployqt/linuxdeployqt.AppImage && \
+    cd /opt/linuxdeployqt && \
+    ./linuxdeployqt.AppImage --appimage-extract && \
+    chmod a+x ./squashfs-root/AppRun && \
+    ln -s /opt/linuxdeployqt/squashfs-root/AppRun /usr/local/bin/linuxdeployqt && \
+    rm -f ./linuxdeployqt.AppImage
+
+
 RUN useradd -ms /bin/bash jenkins && \
-    chown -R jenkins:jenkins /opt/qt
+    chown -R jenkins:jenkins /opt/qt && \
+    chown -R jenkins:jenkins /opt/linuxdeployqt
 
 # configure ccache
 ENV CCACHE_DIR=/mnt/ccache
-ENV CCACHE_MAXSIZE=10G
+ENV CCACHE_MAXSIZE=20G
 
 # Create a shared data volume
 # We need to create an empty file, otherwise the volume will
